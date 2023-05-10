@@ -5,6 +5,7 @@ export declare class Review {
     id: string;
     rating: number;
     comment: string;
+    photo: string;
     createdAt: Date;
     updatedAt: Date;
     user: User;

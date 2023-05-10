@@ -22,6 +22,9 @@ let ReviewsController = class ReviewsController {
     constructor(reviewsService) {
         this.reviewsService = reviewsService;
     }
+    async initData() {
+        return await this.reviewsService.initData();
+    }
     create(createReviewDto) {
         return this.reviewsService.create(createReviewDto);
     }
@@ -38,6 +41,12 @@ let ReviewsController = class ReviewsController {
         return this.reviewsService.remove(id);
     }
 };
+__decorate([
+    (0, common_1.Post)('initData'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ReviewsController.prototype, "initData", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),

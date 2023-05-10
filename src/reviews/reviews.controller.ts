@@ -8,7 +8,10 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) { }
-
+  @Post('initData')
+  async initData() {
+    return await this.reviewsService.initData();
+  }
   @Post()
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewsService.create(createReviewDto);

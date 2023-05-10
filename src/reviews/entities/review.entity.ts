@@ -12,9 +12,13 @@ export class Review {
     @Column()
     rating: number;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'longtext' })
     comment: string;
 
+    @Column({
+        type: 'longtext',
+    })
+    photo: string;
     @CreateDateColumn()
     createdAt: Date;
 

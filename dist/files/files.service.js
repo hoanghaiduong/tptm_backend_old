@@ -8,7 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilesService = void 0;
 const common_1 = require("@nestjs/common");
+const fs = require("fs");
 let FilesService = class FilesService {
+    async fileExists(filePath) {
+        return new Promise((resolve) => {
+            fs.access(filePath, fs.constants.F_OK, (err) => {
+                resolve(!err);
+            });
+        });
+    }
 };
 FilesService = __decorate([
     (0, common_1.Injectable)()

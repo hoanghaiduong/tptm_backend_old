@@ -25,9 +25,15 @@ __decorate([
     __metadata("design:type", Number)
 ], Review.prototype, "rating", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true, type: 'longtext' }),
     __metadata("design:type", String)
 ], Review.prototype, "comment", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'longtext',
+    }),
+    __metadata("design:type", String)
+], Review.prototype, "photo", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
