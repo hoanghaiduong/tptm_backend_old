@@ -20,20 +20,28 @@ const fs = require("fs");
 const multer_1 = require("multer");
 const path = require("path");
 const files_service_1 = require("./files.service");
-const util_1 = require("util");
 let FilesController = class FilesController {
     constructor(filesService) {
         this.filesService = filesService;
+        this.fileHashes = [];
     }
     async uploadFile(file) {
-        console.log(file);
-        const filePath = `src/files/upload/${file.filename}`;
-        return { message: 'File uploaded successfully', file: filePath };
+        try {
+            const filePath = `src/files/upload/${file.filename}`;
+            return { message: 'File uploaded successfully', file: filePath };
+        }
+        catch (error) {
+            throw new common_1.BadRequestException(error.message, error);
+        }
     }
     async uploadMultipleFiles(files) {
-        console.log(files);
-        const filesPath = files.map(file => `src/files/uploads/${file.filename}`);
-        return { message: 'Files uploaded successfully', files: filesPath };
+        try {
+            const filesPath = files.map(file => `src/files/uploads/${file.filename}`);
+            return { message: 'Files uploaded successfully', files: filesPath };
+        }
+        catch (error) {
+            throw new common_1.BadRequestException("Error uploading files" + error.message);
+        }
     }
 };
 __decorate([
@@ -54,9 +62,20 @@ __decorate([
         storage: (0, multer_1.diskStorage)({
             destination: 'src/files/upload',
             filename: (req, file, callback) => {
-                const extension = path.extname(file.originalname);
-                const filename = `${file.originalname}`;
-                callback(null, filename);
+                const uid = req.query.uid;
+                let name = `${uid}-unknown`;
+                if (file.originalname && typeof file.originalname === 'string') {
+                    name = `${uid}-${path.parse(file.originalname).name}`;
+                }
+                const extension = path.parse(file.originalname || '').ext;
+                const filePath = path.join(`src/files/upload`, `${name}${extension}`);
+                if (fs.existsSync(filePath)) {
+                    console.log("file already exists! deleting...");
+                    fs.unlinkSync(filePath);
+                    console.log("Deleted!");
+                }
+                console.log("Uploading...");
+                callback(null, `${name}${extension}`);
             },
         }),
     })),
@@ -85,23 +104,22 @@ __decorate([
     }),
     (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('files', 5, {
         storage: (0, multer_1.diskStorage)({
-            destination: 'src/files/uploads',
+            destination: `src/files/uploads`,
             filename: async (req, file, callback) => {
-                let name = `${Date.now()}-unknown`;
+                const uid = req.query.uid;
+                let name = `${uid}-unknown`;
                 if (file.originalname && typeof file.originalname === 'string') {
-                    name = `${Date.now()}-${path.parse(file.originalname).name}`;
+                    name = `${uid}-${path.parse(file.originalname).name}`;
                 }
                 const extension = path.parse(file.originalname || '').ext;
-                const filePath = path.join('src/files/uploads', `${name}${extension}`);
-                const fileExists = await (0, util_1.promisify)(fs.access)(filePath, fs.constants.F_OK)
-                    .then(() => true)
-                    .catch(() => false);
-                if (!fileExists) {
-                    callback(null, `${name}${extension}`);
+                const filePath = path.join(`src/files/uploads`, `${name}${extension}`);
+                if (fs.existsSync(filePath)) {
+                    console.log("file already exists! deleting...");
+                    fs.unlinkSync(filePath);
+                    console.log("Deleted!");
                 }
-                else {
-                    throw new Error('File already exists');
-                }
+                console.log("Uploading...");
+                callback(null, `${name}${extension}`);
             },
         })
     })),
