@@ -14,10 +14,11 @@ import { UsersModule } from 'src/users/users.module';
 import { RolesService } from 'src/roles/roles.service';
 import { RolesModule } from 'src/roles/roles.module';
 import { JwtService } from '@nestjs/jwt';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Product]),
+    TypeOrmModule.forFeature([Product,ProductImage]),
     CategoryModule,
     RestaurantsModule,
     UsersModule,

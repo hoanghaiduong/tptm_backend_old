@@ -13,34 +13,16 @@ exports.CreateProductDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const auth_payload_interface_1 = require("../../auth/interfaces/auth-payload.interface");
+const product_image_entity_1 = require("../../product-image/entities/product-image.entity");
 class CreateProductDto {
 }
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'Product Title',
-        description: 'The title of the product',
-    }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'Product Subtitle',
-        description: 'The subtitle of the product',
-        required: false,
-    }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "subtitle", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 100.0,
-        description: 'The price of the product',
-    }),
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "price", void 0);
 __decorate([
@@ -52,49 +34,5 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "description", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'https://example.com/product.jpg',
-        description: 'The URL of the product photo',
-    }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "photo", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 10,
-        description: 'The quantity of the product',
-    }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateProductDto.prototype, "quantity", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: '2022-01-01',
-        description: 'The release date of the product',
-        required: false,
-    }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "releaseDate", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: true,
-        description: 'Whether the product is popular or not',
-    }),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateProductDto.prototype, "isPopular", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: false,
-        description: 'Whether the product is featured or not',
-    }),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateProductDto.prototype, "isFeatured", void 0);
 exports.CreateProductDto = CreateProductDto;
 //# sourceMappingURL=create-product.dto.js.map

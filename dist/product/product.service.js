@@ -16,17 +16,20 @@ exports.ProductService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const fs = require("fs");
 const product_entity_1 = require("./entities/product.entity");
 const category_service_1 = require("../category/category.service");
 const restaurants_service_1 = require("../restaurants/restaurants.service");
 const users_service_1 = require("../users/users.service");
+const product_image_entity_1 = require("../product-image/entities/product-image.entity");
 let ProductService = class ProductService {
-    constructor(productRepository, CategoriesService, restaurantService, userService, dataSource) {
+    constructor(productRepository, CategoriesService, restaurantService, userService, dataSource, _productImageRepository) {
         this.productRepository = productRepository;
         this.CategoriesService = CategoriesService;
         this.restaurantService = restaurantService;
         this.userService = userService;
         this.dataSource = dataSource;
+        this._productImageRepository = _productImageRepository;
     }
     async intiProducts() {
         const restaurant = await this.restaurantService.findOne('b08d0a36-d8db-428f-a78a-a3676704c802');
@@ -198,38 +201,47 @@ let ProductService = class ProductService {
             await queryRunner.release();
         }
     }
-    async create(productDto, categoryId, restaurantId, productStatus) {
-        const [category, restaurant, user] = await Promise.all([
-            this.CategoriesService.findOne(categoryId),
-            this.restaurantService.findOne(restaurantId),
-            this.userService.findById(productDto.auth.id),
-        ]);
-        if (!category) {
-            throw new common_1.NotFoundException('Danh mục không tồn tại');
+    async create(productDto) {
+        try {
+            const category = await this.CategoriesService.findOneNoRelation(productDto.categoryId);
+            const restaurant = await this.restaurantService.findOne(productDto.restaurantId);
+            const user = await this.userService.findById("0592f54e-2c12-4e7e-8eef-426121c15f54");
+            if (!category) {
+                throw new common_1.NotFoundException('Danh mục không tồn tại');
+            }
+            if (!restaurant) {
+                throw new common_1.NotFoundException('Nhà hàng không tồn tại');
+            }
+            if (!user) {
+                throw new common_1.NotFoundException("User not found || not accessible");
+            }
+            const product = await this.productRepository.create(Object.assign(Object.assign({}, productDto), { status: productDto.status, category, restaurant, user, images: null, photo: productDto.photo }));
+            const saved = await this.productRepository.save(product);
+            if (!saved) {
+                throw new common_1.BadRequestException("save product failed");
+            }
+            if (productDto.images.length > 0) {
+                if (saved) {
+                    const savedProductImages = productDto.images.map((image) => {
+                        return this._productImageRepository.create({
+                            imageUrl: image,
+                            product: saved
+                        });
+                    });
+                    await Promise.all(savedProductImages.map(image => this._productImageRepository.save(image)));
+                }
+            }
+            return saved;
         }
-        if (!restaurant) {
-            throw new common_1.NotFoundException('Nhà hàng không tồn tại');
+        catch (error) {
+            console.log("Create Product failed ! File deleting...");
+            fs.unlinkSync(`public/${productDto.photo}`);
+            productDto.images.map(image => {
+                fs.unlinkSync(`public/${image}`);
+            });
+            console.log("Deleted!");
+            throw new common_1.BadRequestException(error.message);
         }
-        if (!user) {
-            throw new common_1.NotFoundException("User not found || not accessible");
-        }
-        const existingProduct = await this.productRepository.findOne({
-            where: { title: productDto.title, restaurant: (0, typeorm_2.Not)(restaurant) }
-        });
-        if (existingProduct) {
-            throw new common_1.BadRequestException('Sản phẩm đã tồn tại trong một nhà hàng khác');
-        }
-        const product = await this.productRepository.create(Object.assign(Object.assign({}, productDto), { status: productStatus, category, restaurant }));
-        return await this.productRepository.save(product);
-    }
-    async update(id, productDto) {
-        const product = await this.findOne(id);
-        const merged = await this.productRepository.merge(product, productDto);
-        const update = await this.productRepository.update(id, merged);
-        if (!update) {
-            throw new common_1.BadRequestException("Update product failed");
-        }
-        return merged;
     }
     async remove(id) {
         await this.findOne(id);
@@ -243,11 +255,13 @@ let ProductService = class ProductService {
 ProductService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(product_entity_1.Product)),
+    __param(5, (0, typeorm_1.InjectRepository)(product_image_entity_1.ProductImage)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         category_service_1.CategoryService,
         restaurants_service_1.RestaurantsService,
         users_service_1.UsersService,
-        typeorm_2.DataSource])
+        typeorm_2.DataSource,
+        typeorm_2.Repository])
 ], ProductService);
 exports.ProductService = ProductService;
 //# sourceMappingURL=product.service.js.map

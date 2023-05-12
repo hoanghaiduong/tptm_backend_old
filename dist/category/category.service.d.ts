@@ -17,6 +17,7 @@ export declare class CategoryService {
         limit?: number;
     }>;
     findOne(id: string): Promise<Category>;
+    findOneNoRelation(id: string): Promise<Category>;
     update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category>;
     remove(id: string): Promise<void>;
 }

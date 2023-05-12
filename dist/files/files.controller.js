@@ -23,7 +23,6 @@ const files_service_1 = require("./files.service");
 let FilesController = class FilesController {
     constructor(filesService) {
         this.filesService = filesService;
-        this.fileHashes = [];
     }
     async uploadFile(file) {
         try {
@@ -42,6 +41,22 @@ let FilesController = class FilesController {
         catch (error) {
             throw new common_1.BadRequestException("Error uploading files" + error.message);
         }
+    }
+    getFile(filename, res) {
+        const path = `public/product/uploads/images/${filename}`;
+        const fileContent = fs.readFileSync(path);
+        res.header('Content-Type', 'image/jpeg');
+        res.send(fileContent);
+    }
+    getAllFiles() {
+        const directoryPath = 'public/product/uploads/images';
+        const files = fs.readdirSync(directoryPath);
+        const imageFiles = files.filter(file => file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.png'));
+        const result = imageFiles.map(filename => ({
+            filename,
+            path: `${directoryPath}/${filename}`
+        }));
+        return result;
     }
 };
 __decorate([
@@ -129,6 +144,20 @@ __decorate([
     __metadata("design:paramtypes", [Array]),
     __metadata("design:returntype", Promise)
 ], FilesController.prototype, "uploadMultipleFiles", null);
+__decorate([
+    (0, common_1.Get)('file-name'),
+    __param(0, (0, common_1.Query)('filename')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], FilesController.prototype, "getFile", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], FilesController.prototype, "getAllFiles", null);
 FilesController = __decorate([
     (0, common_1.Controller)('files'),
     (0, swagger_1.ApiTags)('FILE'),

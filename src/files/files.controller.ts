@@ -1,8 +1,8 @@
-import { BadRequestException, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Query, Res, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as fs from 'fs';
-import { Express, request } from 'express';
+import { Express, Response, request } from 'express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { FilesService } from './files.service';
@@ -11,7 +11,7 @@ import * as crypto from 'crypto';
 @Controller('files')
 @ApiTags('FILE')
 export class FilesController {
-    private fileHashes: string[] = [];
+
     constructor(private readonly filesService: FilesService) { }
     @Post('upload')
 
@@ -52,6 +52,7 @@ export class FilesController {
             },
         }),
     }))
+    
     @ApiResponse({ status: 200, description: 'File uploaded successfully' })
     async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<string | any> {
         try {
@@ -116,6 +117,24 @@ export class FilesController {
         }
     }
 
+    @Get('file-name')
+    getFile(@Query('filename') filename: string, @Res() res: Response) {
+        const path = `public/product/uploads/images/${filename}`; // đường dẫn tới thư mục chứa tệp
+        const fileContent = fs.readFileSync(path); // đọc nội dung của tệp
+        res.header('Content-Type', 'image/jpeg'); // thiết lập header Content-Type cho tệp ảnh JPEG
+        res.send(fileContent); // trả về nội dung của tệp
+    }
+    @Get()
+    getAllFiles() {
+      const directoryPath = 'public/product/uploads/images';
+      const files = fs.readdirSync(directoryPath);
+      const imageFiles = files.filter(file => file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.png'));
+      const result = imageFiles.map(filename => ({
+        filename,
+        path: `${directoryPath}/${filename}`
+      }));
+      return result;
+    }
 }
 
 

@@ -45,6 +45,7 @@ let RolesGuard = class RolesGuard extends (0, passport_1.AuthGuard)('jwt') {
                 algorithms: ['HS256'],
             });
             request.user = payload;
+            request.uid = payload.id;
             const uid = payload.id;
             const role = (await this.userService.findById(uid)).role;
             console.log(requiredRoles.includes(role.name));

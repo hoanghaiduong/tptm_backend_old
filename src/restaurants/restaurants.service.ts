@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, Req, UseGuards } from '@nestjs/common';
+import {  BadRequestException, Injectable, NotFoundException, Req, UseGuards } from '@nestjs/common';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -187,7 +187,7 @@ export class RestaurantsService {
       where: { id },
     });
     if (!restaurant) {
-      throw new NotFoundException("Restaurant not found");
+      throw new NotFoundException("Nhà hàng không tồn tại");
     }
     return restaurant;
   }

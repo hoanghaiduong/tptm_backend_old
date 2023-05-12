@@ -180,7 +180,7 @@ let RestaurantsService = class RestaurantsService {
             where: { id },
         });
         if (!restaurant) {
-            throw new common_1.NotFoundException("Restaurant not found");
+            throw new common_1.NotFoundException("Nhà hàng không tồn tại");
         }
         return restaurant;
     }

@@ -8,9 +8,10 @@ export declare class CreateProductDto {
     photo: string;
     quantity: number;
     releaseDate?: string;
-    status: null | string;
+    status: string;
     isPopular: boolean;
     isFeatured: boolean;
     categoryId: string;
     restaurantId: string;
+    images: string[];
 }

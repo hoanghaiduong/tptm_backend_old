@@ -1,19 +1,19 @@
 import { DataSource, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './entities/product.entity';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductStatus } from './enum/product.enum';
 import { CategoryService } from 'src/category/category.service';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { CreateProductsDto } from './dto/create-products.dto';
 import { UsersService } from 'src/users/users.service';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 export declare class ProductService {
     private readonly productRepository;
     private CategoriesService;
     private restaurantService;
     private userService;
     private dataSource;
-    constructor(productRepository: Repository<Product>, CategoriesService: CategoryService, restaurantService: RestaurantsService, userService: UsersService, dataSource: DataSource);
+    private _productImageRepository;
+    constructor(productRepository: Repository<Product>, CategoriesService: CategoryService, restaurantService: RestaurantsService, userService: UsersService, dataSource: DataSource, _productImageRepository: Repository<ProductImage>);
     intiProducts(): Promise<Product[]>;
     findAll(page?: number, limit?: number): Promise<{
         products: Product[];
@@ -26,7 +26,6 @@ export declare class ProductService {
         count: number;
     }>;
     addProducts(products: CreateProductsDto): Promise<void | any>;
-    create(productDto: CreateProductDto, categoryId: string, restaurantId: string, productStatus: ProductStatus): Promise<Product>;
-    update(id: string, productDto: UpdateProductDto): Promise<Product>;
+    create(productDto: CreateProductDto): Promise<Product | any>;
     remove(id: string): Promise<Object>;
 }

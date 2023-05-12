@@ -55,6 +55,9 @@ let CategoryService = class CategoryService {
     async findOne(id) {
         return this.categoryRepository.findOne({ where: { id }, relations: ['products'] });
     }
+    async findOneNoRelation(id) {
+        return this.categoryRepository.findOne({ where: { id } });
+    }
     async update(id, updateCategoryDto) {
         const category = await this.categoryRepository.findOne({ where: { id } });
         if (!category) {

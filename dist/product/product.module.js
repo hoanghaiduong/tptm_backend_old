@@ -24,12 +24,13 @@ const users_module_1 = require("../users/users.module");
 const roles_service_1 = require("../roles/roles.service");
 const roles_module_1 = require("../roles/roles.module");
 const jwt_1 = require("@nestjs/jwt");
+const product_image_entity_1 = require("../product-image/entities/product-image.entity");
 let ProductModule = ProductModule_1 = class ProductModule {
 };
 ProductModule = ProductModule_1 = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([product_entity_1.Product]),
+            typeorm_1.TypeOrmModule.forFeature([product_entity_1.Product, product_image_entity_1.ProductImage]),
             category_module_1.CategoryModule,
             restaurants_module_1.RestaurantsModule,
             users_module_1.UsersModule,

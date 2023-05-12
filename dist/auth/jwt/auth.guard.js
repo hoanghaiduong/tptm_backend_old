@@ -17,10 +17,8 @@ const Role_entity_1 = require("../../roles/entities/Role.entity");
 const roles_service_1 = require("../../roles/roles.service");
 const users_service_1 = require("../../users/users.service");
 let AuthGuard = class AuthGuard {
-    constructor(jwtService, userService, roleService) {
+    constructor(jwtService) {
         this.jwtService = jwtService;
-        this.userService = userService;
-        this.roleService = roleService;
     }
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
@@ -33,7 +31,8 @@ let AuthGuard = class AuthGuard {
                 secret: constants_1.JWT_SECRET_KEY,
                 algorithms: ['HS256'],
             });
-            request['user'] = payload;
+            request.user = payload;
+            request.uid = payload.id;
         }
         catch (err) {
             throw new common_1.BadRequestException({
@@ -51,9 +50,7 @@ let AuthGuard = class AuthGuard {
 };
 AuthGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService,
-        users_service_1.UsersService,
-        roles_service_1.RolesService])
+    __metadata("design:paramtypes", [jwt_1.JwtService])
 ], AuthGuard);
 exports.AuthGuard = AuthGuard;
 //# sourceMappingURL=auth.guard.js.map

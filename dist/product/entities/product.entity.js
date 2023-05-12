@@ -19,6 +19,7 @@ const User_entity_1 = require("../../users/entities/User.entity");
 const order_item_entity_1 = require("../../order-item/entities/order-item.entity");
 const cart_entity_1 = require("../../cart/entities/cart.entity");
 const cart_item_entity_1 = require("../../cart-item/entities/cart-item.entity");
+const product_image_entity_1 = require("../../product-image/entities/product-image.entity");
 let Product = class Product {
 };
 __decorate([
@@ -45,6 +46,14 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true, type: "longtext" }),
     __metadata("design:type", String)
 ], Product.prototype, "photo", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => product_image_entity_1.ProductImage, image => image.product, {
+        cascade: true,
+        eager: true,
+        nullable: true
+    }),
+    __metadata("design:type", Array)
+], Product.prototype, "images", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Number)

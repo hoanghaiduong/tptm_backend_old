@@ -1,13 +1,22 @@
-import { Controller, Get } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Render } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiTags } from '@nestjs/swagger';
-@Controller('/api/')
+@Controller()
 @ApiTags('TEST API')
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Get('/test')
-  getHello(): string {
-    return this.appService.getHello();
+  @Get()
+  @Render('404')
+  getHello() {
+    try {
+      return {
+        statusCode:200,
+        message: "Hello everyone"
+      }
+    } catch (error) {
+
+      throw new BadRequestException(error.message)
+    }
   }
 }

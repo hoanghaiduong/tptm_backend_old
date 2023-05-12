@@ -10,6 +10,7 @@ import { Review } from 'src/reviews/entities/review.entity';
 import { OrderItem } from 'src/order-item/entities/order-item.entity';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { CartItem } from 'src/cart-item/entities/cart-item.entity';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 
 dotenv.config();
@@ -28,7 +29,7 @@ const GOOGLE_MAPS_API_KEY=process.env.GOOGLE_MAPS_API_KEY;
 const ACCESS_KEY_TOKEN_IPSTACK=process.env.ACCESS_KEY_TOKEN_IPSTACK;
 const ENTITIES = [
     User, Role, Product, Category, Restaurant,Review,
-    OrderItem,Order,Cart,CartItem
+    OrderItem,Order,Cart,CartItem,ProductImage
 ]
 
 // const ENTITIES = ['dist/**/*.entity{.ts,.js}'];

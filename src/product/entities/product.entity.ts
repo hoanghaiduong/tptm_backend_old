@@ -9,6 +9,7 @@ import { User } from "src/users/entities/User.entity";
 import { OrderItem } from "src/order-item/entities/order-item.entity";
 import { Cart } from "src/cart/entities/cart.entity";
 import { CartItem } from "src/cart-item/entities/cart-item.entity";
+import { ProductImage } from "src/product-image/entities/product-image.entity";
 
 @Entity()
 export class Product {
@@ -30,10 +31,17 @@ export class Product {
     @Column({ nullable: true, type: "longtext" })
     photo: string;
 
+    @OneToMany(() => ProductImage, image => image.product, {
+        cascade: true,
+        eager: true,
+        nullable: true
+    })
+    images: ProductImage[];
+
     @Column({ nullable: true })
     quantity: number;
 
-    @Column({ type: 'date' ,nullable:true})
+    @Column({ type: 'date', nullable: true })
     releaseDate: string;
 
     @Column({ nullable: true })
@@ -47,21 +55,21 @@ export class Product {
 
     @Column({ nullable: true })
     type: string;
-    @Column({nullable: true })
-    dvt:string;
+    @Column({ nullable: true })
+    dvt: string;
 
     @ManyToOne(() => Category, category => category.products, { nullable: true })
     @JoinColumn({ name: 'categoryId', referencedColumnName: 'id' })
     category: Category;
 
-    @OneToMany(() => OrderItem, (orderItem) => orderItem.product,{nullable:true})
+    @OneToMany(() => OrderItem, (orderItem) => orderItem.product, { nullable: true })
     orderItems: OrderItem[];
 
 
     @ManyToOne(() => User, { eager: true, nullable: true })
     user: User;
 
-    @OneToMany(() => Review, review => review.product, { cascade: true, nullable: true  })
+    @OneToMany(() => Review, review => review.product, { cascade: true, nullable: true })
     reviews: Review[];
 
 
@@ -75,7 +83,7 @@ export class Product {
         eager: true,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-       nullable: true 
+        nullable: true
     })
     cartItems: CartItem[];
 }

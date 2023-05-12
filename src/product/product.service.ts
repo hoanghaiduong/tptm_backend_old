@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Not, QueryFailedError, Repository, getManager } from 'typeorm';
-
+import * as fs from 'fs';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './entities/product.entity';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -10,6 +10,9 @@ import { CategoryService } from 'src/category/category.service';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { CreateProductsDto } from './dto/create-products.dto';
 import { UsersService } from 'src/users/users.service';
+import multer, { diskStorage } from 'multer';
+import * as path from 'path';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Injectable()
 export class ProductService {
@@ -19,7 +22,9 @@ export class ProductService {
     private CategoriesService: CategoryService,
     private restaurantService: RestaurantsService,
     private userService: UsersService,
-    private dataSource: DataSource
+    private dataSource: DataSource,
+    @InjectRepository(ProductImage)
+    private _productImageRepository: Repository<ProductImage>
   ) { }
 
   async intiProducts() {
@@ -742,7 +747,7 @@ export class ProductService {
         subtitle: 'Cháo',
         description: '',
         price: 49000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -750,7 +755,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 72000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -758,25 +763,25 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 52000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
         title: 'Mì Sườn',
-        type:'',
+        type: '',
         subtitle: '',
         description: '',
         price: 45000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
         title: 'Cháo hải sản',
-        type:'',
+        type: '',
         subtitle: '',
         description: '',
         price: 45000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -784,7 +789,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 97000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -792,7 +797,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 97000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -800,7 +805,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 76000,
-        dvt:'1/SET',
+        dvt: '1/SET',
         restaurant,
       },
       {
@@ -808,7 +813,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 390000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -816,7 +821,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 45000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -824,7 +829,7 @@ export class ProductService {
         subtitle: '',
         description: '',
         price: 135000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -832,7 +837,7 @@ export class ProductService {
         subtitle: 'GÀ',
         description: '',
         price: 296000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
       {
@@ -840,7 +845,7 @@ export class ProductService {
         subtitle: 'GÀ',
         description: '',
         price: 360000,
-        dvt:'1/Phần',
+        dvt: '1/Phần',
         restaurant,
       },
     ])
@@ -920,45 +925,111 @@ export class ProductService {
     }
   }
 
-  async create(productDto: CreateProductDto, categoryId: string, restaurantId: string, productStatus: ProductStatus): Promise<Product> {
-    const [category, restaurant, user] = await Promise.all([
-      this.CategoriesService.findOne(categoryId),
-      this.restaurantService.findOne(restaurantId),
-      this.userService.findById(productDto.auth.id),
-    ]);
 
-    if (!category) {
-      throw new NotFoundException('Danh mục không tồn tại');
-    }
+  async create(productDto: CreateProductDto): Promise<Product | any> {
 
-    if (!restaurant) {
-      throw new NotFoundException('Nhà hàng không tồn tại');
-    }
-    if (!user) {
-      throw new NotFoundException("User not found || not accessible");
-    }
-    // Kiểm tra xem sản phẩm đã được liên kết với nhà hàng khác chưa
-    const existingProduct = await this.productRepository.findOne({
-      where: { title: productDto.title, restaurant: Not(restaurant) }
-    });
-    if (existingProduct) {
-      throw new BadRequestException('Sản phẩm đã tồn tại trong một nhà hàng khác');
-    }
-    const product = await this.productRepository.create({ ...productDto, status: productStatus, category, restaurant });
+    try {
 
-    return await this.productRepository.save(product);
+      const category = await this.CategoriesService.findOneNoRelation(productDto.categoryId);
+      const restaurant = await this.restaurantService.findOne(productDto.restaurantId);
+      //const user = await this.userService.findById(productDto.auth.id);
+      const user = await this.userService.findById("0592f54e-2c12-4e7e-8eef-426121c15f54");
+      if (!category) {
+        throw new NotFoundException('Danh mục không tồn tại');
+      }
+
+      if (!restaurant) {
+        throw new NotFoundException('Nhà hàng không tồn tại');
+      }
+
+      if (!user) {
+        throw new NotFoundException("User not found || not accessible");
+      }
+
+      // // Kiểm tra xem sản phẩm đã được liên kết với nhà hàng khác chưa
+      // const existingProduct = await this.productRepository.findOne({
+      //   where: { title: productDto.title, restaurant: Not(restaurant) }
+      // });
+      // if (existingProduct) {
+      //   throw new BadRequestException('Sản phẩm đã tồn tại trong một nhà hàng khác');
+      // }
+
+      const product = await this.productRepository.create({ ...productDto, status: productDto.status, category, restaurant, user, images: null, photo: productDto.photo });
+
+      const saved = await this.productRepository.save(product);
+      if (!saved) {
+        throw new BadRequestException("save product failed")
+      }
+      if (productDto.images.length > 0) {
+        if (saved) {
+          const savedProductImages = productDto.images.map((image) => {
+            return this._productImageRepository.create({
+              imageUrl: image,
+              product: saved
+            });
+          });
+
+          await Promise.all(savedProductImages.map(image => this._productImageRepository.save(image)));
+
+        }
+
+      }
+      return saved;
+
+    } catch (error) {
+
+      console.log("Create Product failed ! File deleting...");
+      fs.unlinkSync(`public/${productDto.photo}`);
+      productDto.images.map(image => {
+        fs.unlinkSync(`public/${image}`);
+      })
+      console.log("Deleted!");
+
+      throw new BadRequestException(error.message)
+    }
+    //   const category = await this.CategoriesService.findOne(productDto.categoryId);
+    //   const restaurant = await this.restaurantService.findOne(productDto.restaurantId);
+    //   const user = await this.userService.findById(productDto.auth.id);
+
+    //   if (!category) {
+    //     throw new NotFoundException('Danh mục không tồn tại');
+    //   }
+
+    //   if (!restaurant) {
+    //     throw new NotFoundException('Nhà hàng không tồn tại');
+    //   }
+
+    //   if (!user) {
+    //     throw new NotFoundException("User not found || not accessible");
+    //   }
+
+    //   // Kiểm tra xem sản phẩm đã được liên kết với nhà hàng khác chưa
+    //   const existingProduct = await this.productRepository.findOne({
+    //     where: { title: productDto.title, restaurant: Not(restaurant) }
+    //   });
+    //   if (existingProduct) {
+    //     throw new BadRequestException('Sản phẩm đã tồn tại trong một nhà hàng khác');
+    //   }
+
+    //   const product = await this.productRepository.create({ ...productDto, status: productDto.status, category, restaurant, images: null ,photo: null });
+
+    //   const saved = await this.productRepository.save(product);
+    //   return saved;
+    // } catch (error) {
+    //   throw new BadRequestException(error.message)
+    // }
 
   }
 
-  async update(id: string, productDto: UpdateProductDto): Promise<Product> {
-    const product = await this.findOne(id);
-    const merged = await this.productRepository.merge(product, productDto);
-    const update = await this.productRepository.update(id, merged);
-    if (!update) {
-      throw new BadRequestException("Update product failed")
-    }
-    return merged;
-  }
+  // async update(id: string, productDto: UpdateProductDto): Promise<Product> {
+  //   const product = await this.findOne(id);
+  //   const merged = await this.productRepository.merge(product, productDto);
+  //   const update = await this.productRepository.update(id, merged);
+  //   if (!update) {
+  //     throw new BadRequestException("Update product failed")
+  //   }
+  //   return merged;
+  // }
 
   async remove(id: string): Promise<Object> {
     await this.findOne(id);

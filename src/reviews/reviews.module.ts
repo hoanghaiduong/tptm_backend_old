@@ -11,9 +11,10 @@ import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/User.entity';
 import { UsersService } from 'src/users/users.service';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review,Product,Category,Restaurant,User])],
+  imports: [TypeOrmModule.forFeature([Review,Product,Category,Restaurant,User,ProductImage])],
   controllers: [ReviewsController],
   providers: [ReviewsService,ProductService,CategoryService,RestaurantsService,UsersService],
   exports: [ReviewsModule, TypeOrmModule]

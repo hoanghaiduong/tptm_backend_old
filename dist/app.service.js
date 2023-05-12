@@ -12,13 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const constants_1 = require("./config/constants");
 let AppService = class AppService {
     constructor(configService) {
         this.configService = configService;
-    }
-    getHello() {
-        return `Hello World! The database host is ${constants_1.PORT_SERVER}`;
     }
 };
 AppService = __decorate([

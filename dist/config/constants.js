@@ -12,6 +12,7 @@ const review_entity_1 = require("../reviews/entities/review.entity");
 const order_item_entity_1 = require("../order-item/entities/order-item.entity");
 const cart_entity_1 = require("../cart/entities/cart.entity");
 const cart_item_entity_1 = require("../cart-item/entities/cart-item.entity");
+const product_image_entity_1 = require("../product-image/entities/product-image.entity");
 dotenv.config();
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 exports.JWT_SECRET_KEY = JWT_SECRET_KEY;
@@ -41,7 +42,7 @@ const ACCESS_KEY_TOKEN_IPSTACK = process.env.ACCESS_KEY_TOKEN_IPSTACK;
 exports.ACCESS_KEY_TOKEN_IPSTACK = ACCESS_KEY_TOKEN_IPSTACK;
 const ENTITIES = [
     User_entity_1.User, Role_entity_1.Role, product_entity_1.Product, category_entity_1.Category, restaurant_entity_1.Restaurant, review_entity_1.Review,
-    order_item_entity_1.OrderItem, order_entity_1.Order, cart_entity_1.Cart, cart_item_entity_1.CartItem
+    order_item_entity_1.OrderItem, order_entity_1.Order, cart_entity_1.Cart, cart_item_entity_1.CartItem, product_image_entity_1.ProductImage
 ];
 exports.ENTITIES = ENTITIES;
 //# sourceMappingURL=constants.js.map

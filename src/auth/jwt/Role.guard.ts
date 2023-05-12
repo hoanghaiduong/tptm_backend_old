@@ -40,6 +40,7 @@ export class RolesGuard extends AuthGuard('jwt') {
                 }
             );
             request.user = payload;
+            request.uid = payload.id;
             const uid = payload.id;
             const role = (await this.userService.findById(uid)).role;
 
